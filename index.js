@@ -13,7 +13,9 @@ require("./models/agency")
 require("./models/car")
 require("./models/rentedCars")
 app.use(express.json())//parsing the req before it get to routes
-app.use(cors())
+app.use(cors({
+    origin:"https://car-rental-frontend-pt7r.onrender.com"
+}))
 
 app.use(require('./routes/auth'))
 app.use(require('./routes/post'))
