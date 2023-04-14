@@ -9,7 +9,7 @@ const requireLogin = require("../middleware/requireLogin");
 const requireUserLogin = require("../middleware/requireUserLogin");
 
 router.post("/addcar",requireLogin, (req, res) => {
-    // const {authorization}=req.headers
+    
     // console.log(req.user)
     const {model,carNumber,seatingCapacity,rentPerDay,carImage}=req.body
 
