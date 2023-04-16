@@ -1,6 +1,3 @@
-// const {JWT_SECRET} = require("../keys")
-// const JWT_SECRET="avbgdfr";
-
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose")
 const Agency = mongoose.model("Agency")
