@@ -4,7 +4,6 @@ const express = require("express");
 const mongoose = require('mongoose')
 const app = express()
 const cors = require('cors')
-// const {MONGO_URI} = require("./keys")
 const PORT = 8080
 
 

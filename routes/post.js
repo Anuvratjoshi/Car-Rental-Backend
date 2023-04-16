@@ -9,7 +9,7 @@ const requireLogin = require("../middleware/requireLogin");
 const requireUserLogin = require("../middleware/requireUserLogin");
 
 router.post("/addcar",requireLogin, (req, res) => {
-    
+    // const {authorization}=req.headers
     // console.log(req.user)
     const {model,carNumber,seatingCapacity,rentPerDay,carImage}=req.body
 
@@ -34,15 +34,19 @@ router.post("/addcar",requireLogin, (req, res) => {
     })
 })
 
-router.post("/addedcar",requireLogin,(req,res)=>{
-    const {agencyId} = req.body
-    Car.find({addedBy:agencyId})
+router.post("/viewpostedcars",requireLogin,(req,res)=>{
+    // console.log(req.user)
+    const {_id} = req.user
+    // const {agencyId} = req.body
+    Car.find({addedBy:_id})
     .then(result=>{
         // console.log(result)
-        res.json(result)
+        if(!result.length){
+            return res.json({error:"No cars Added"})
+        }
+        return res.json(result)
     })
 })
-
 
 router.get("/allcars",requireLogin,(req,res)=>{
     // console.log(req.headers)
@@ -57,8 +61,9 @@ router.get("/allcars",requireLogin,(req,res)=>{
     })
 })
 
-router.post("/rentcar",requireLogin,(req,res)=>{
-    const {model,days,rentedFor} = req.body
+router.post("/rentcar",requireUserLogin,(req,res)=>{
+    const {model,days} = req.body
+    // console.log(req.body)
     if(!days){
         return res.status(422).json({error:"Select the number of days by clicking on dropdown"})
     }
@@ -72,7 +77,7 @@ router.post("/rentcar",requireLogin,(req,res)=>{
             rentPerDay:savedCar.rentPerDay,
             carImage:savedCar.carImage,
             totalPrice: savedCar.rentPerDay*parseInt(days),
-            rentedFor:rentedFor,
+            rentedFor:req.user.email,
             agencyId:savedCar.addedBy
         })
         // console.log(bookedCar)
@@ -83,20 +88,29 @@ router.post("/rentcar",requireLogin,(req,res)=>{
     })
 })
 
-router.post("/cartitems",requireUserLogin,(req,res)=>{
+router.get("/cartitems",requireUserLogin,(req,res)=>{
     
-    const {rentedFor} = req.body
+    // const {rentedFor} = req.body
     // console.log(rentedFor)
-    RentedCars.find({rentedFor:rentedFor})
+    RentedCars.find({rentedFor:req.user.email})
     .then(rentedcars=>{
         // console.log(rentedcars)
         if(rentedcars.length==0){
            return res.status(401).json({error:"Rent a car first to see your rented car"})
         }
         else{
-            console.log(rentedcars)
+            // console.log(rentedcars)
             res.json(rentedcars)
         }
+    })
+})
+router.get("/totalrenteditem",requireUserLogin,(req,res)=>{
+    const {email} = req.user
+    // console.log(email)
+    RentedCars.find({rentedFor:email})
+    .then(rentedCarData=>{
+        // console.log(rentedCarData.length)
+        res.json(rentedCarData.length)
     })
 })
 
@@ -115,6 +129,24 @@ router.get("/bookedcars",requireLogin,(req,res)=>{
         return res.json(bookedCarData)
     }
    })
+})
+
+router.delete("/deletecar",requireUserLogin,(req,res)=>{
+    // console.log(req.body)
+    RentedCars.findOneAndDelete({_id:req.body._id})
+    .then(result=>{
+        res.json(result)
+    })
+    .catch(err=>console.log(err))
+})
+
+router.delete("/deleteagencycar",requireLogin,(req,res)=>{
+    // console.log(req.body)
+    Car.findOneAndDelete({_id:req.body._id})
+    .then(result=>{
+        res.json(result)
+    })
+    .catch(err=>console.log(err))
 })
 
 module.exports = router
