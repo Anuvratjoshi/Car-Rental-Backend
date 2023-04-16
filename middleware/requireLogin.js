@@ -1,5 +1,5 @@
-const dotenv = require("dotenv");
-dotenv.config()
+const {JWT_SECRET} = require("../keys")
+// const JWT_SECRET="avbgdfr";
 
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose")
@@ -11,7 +11,7 @@ module.exports = (req,res,next)=>{
     }
     const token = authorization.replace("Bearer ","")
     // console.log(token)
-    jwt.verify(token,process.env.JWT_SECRET,(err,payload)=>{
+    jwt.verify(token,JWT_SECRET,(err,payload)=>{
         if(err){
             // console.log(err)
             return res.status(401).json({error:"You must be logged in first"})
